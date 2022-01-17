@@ -6,6 +6,8 @@ let pencilKaColor = document.querySelectorAll(".pencil-color");
 let pencilKiWidthKaElement = document.querySelector(".pencil-width");
 let eraserKiWidthKaElement = document.querySelector(".eraser-width");
 let download = document.querySelector(".download");
+let redo = document.querySelector(".redo");
+let undo = document.querySelector(".undo");
 
 let penKaColor = "red";
 let eraserKaColor = "white";
@@ -48,7 +50,44 @@ canvas.addEventListener("mousemove", (e) => {
 })
 canvas.addEventListener("mouseup", (e) => {
     mousedown = false;
+
+    let url = canvas.toDataURL();
+    undoRedoTracker.push(url);
+    track = undoRedoTracker.length-1;
 })
+
+undo.addEventListener("click", (e) => {
+    if(track > 0) track--;
+    //track action
+    let trackObject = {
+        trackValue: track,
+         undoRedoTracker
+    } 
+    undoRedoCanvas(trackObject);
+})
+
+redo.addEventListener("click", (e) => {
+    if(track < undoRedoTracker.length-1) track++;
+    //track action
+    let trackObject = {
+        trackValue: track,
+         undoRedoTracker
+    }
+    undoRedoCanvas(trackObject);
+})
+
+function undoRedoCanvas(trackObject) {
+    track = trackObject.trackValue;
+    undoRedoTracker = trackObject.undoRedoTracker;
+
+    let url = undoRedoTracker[track];
+    let img = new Image();//new image ki reference create hojayegi!
+    img.src = url;
+    img.onload = (e) => {
+        tool.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
+
+}
 
 function beginPath(strokeKaObject) {
     tool.beginPath();
